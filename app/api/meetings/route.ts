@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getMeetings } from "@/lib/meetings-db";
+import { getAllMeetings } from "@/lib/meetings-db";
 import type { SacramentMeeting } from "@/lib/types";
 
 // GET /api/meetings or /api/meetings?date=2026-11-01
@@ -12,5 +12,6 @@ export async function GET(
     return NextResponse.json({ error: "Date must be in YYYY-MM-DD format" }, { status: 400 });
   }
 
-  return NextResponse.json(getMeetings(date));
+  const meetings = await getAllMeetings(date);
+  return NextResponse.json(meetings);
 }

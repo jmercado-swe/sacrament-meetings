@@ -1,159 +1,145 @@
+import { neon } from "@neondatabase/serverless";
 import type { SacramentMeeting } from "./types";
 
-// Temporary in-memory data. This will be replaced by a database in later weeks.
-const meetings: SacramentMeeting[] = [
-  {
-    id: 1,
-    date: "2026-10-04",
-    meetingType: "general",
-    presiding: "Bishop Daniel Santos",
-    conducting: "Brother Mark Reyes",
-    announcements: ["General Conference broadcast in the chapel at 10:00 AM."],
-    openingHymn: { number: 19, title: "We Thank Thee, O God, for a Prophet" },
-    openingPrayer: "Sister Ana Cruz",
-    wardBusiness: [],
-    stakeBusiness: false,
-    sacramentHymn: { number: 0, title: "None (no sacrament meeting)" },
-    speakers: [],
-    closingHymn: { number: 2, title: "The Spirit of God" },
-    closingPrayer: "Brother Leo Garcia",
-  },
-  {
-    id: 2,
-    date: "2026-10-11",
-    meetingType: "regular",
-    presiding: "Bishop Daniel Santos",
-    conducting: "Brother John Villanueva",
-    announcements: [
-      "Ward temple day on Saturday, October 17.",
-      "Primary program practice after church.",
-    ],
-    openingHymn: { number: 85, title: "How Firm a Foundation" },
-    openingPrayer: "Sister Grace Lim",
-    wardBusiness: [
-      { description: "Release of Sister Joy Ramos as Primary pianist." },
-      { description: "Sustaining of Brother Paul Tan as Sunday School teacher." },
-    ],
-    stakeBusiness: false,
-    sacramentHymn: { number: 169, title: "As Now We Take the Sacrament" },
-    speakers: [
-      { name: "Sister Mia Flores", topic: "Gratitude", type: "speaker" },
-      { name: "Youth Choir", topic: "I Am a Child of God", type: "musical-number" },
-      { name: "Brother Carlo Diaz", topic: "Faith in Jesus Christ", type: "speaker" },
-    ],
-    closingHymn: { number: 136, title: "I Know That My Redeemer Lives" },
-    closingPrayer: "Brother Ben Torres",
-  },
-  {
-    id: 3,
-    date: "2026-10-18",
-    meetingType: "stake",
-    presiding: "President Samuel Mendoza",
-    conducting: "President Samuel Mendoza",
-    announcements: ["Stake conference at the stake center at 9:00 AM."],
-    openingHymn: { number: 6, title: "Redeemer of Israel" },
-    openingPrayer: "Sister Rose Aquino",
-    wardBusiness: [],
-    stakeBusiness: true,
-    sacramentHymn: { number: 0, title: "None (no sacrament meeting)" },
-    speakers: [
-      { name: "President Samuel Mendoza", topic: "Strengthening Families", type: "speaker" },
-      { name: "Stake Choir", topic: "Come, Come, Ye Saints", type: "musical-number" },
-    ],
-    closingHymn: { number: 3, title: "Now Let Us Rejoice" },
-    closingPrayer: "Brother Eli Navarro",
-  },
-  {
-    id: 4,
-    date: "2026-10-25",
-    meetingType: "regular",
-    presiding: "Bishop Daniel Santos",
-    conducting: "Brother Mark Reyes",
-    announcements: ["Ward Halloween party on Friday, October 30."],
-    openingHymn: { number: 72, title: "Praise to the Lord, the Almighty" },
-    openingPrayer: "Brother Sam Uy",
-    wardBusiness: [{ description: "Sustaining of Sister Lea Bautista as Relief Society secretary." }],
-    stakeBusiness: false,
-    sacramentHymn: { number: 193, title: "I Stand All Amazed" },
-    speakers: [
-      { name: "Brother Noel Castro", topic: "Ministering", type: "speaker" },
-      { name: "Sister Ivy Ramos", topic: "Gently Raise the Sacred Strain (piano solo)", type: "musical-number" },
-      { name: "Sister Hope Reyes", topic: "The Sabbath Day", type: "speaker" },
-    ],
-    closingHymn: { number: 152, title: "God Be with You Till We Meet Again" },
-    closingPrayer: "Sister Faith Lopez",
-  },
-  {
-    id: 5,
-    date: "2026-11-01",
-    meetingType: "testimony",
-    presiding: "Bishop Daniel Santos",
-    conducting: "Brother John Villanueva",
-    announcements: ["Fast offering envelopes are available in the foyer."],
-    openingHymn: { number: 26, title: "Joseph Smith's First Prayer" },
-    openingPrayer: "Sister Ana Cruz",
-    wardBusiness: [{ description: "Baby blessing for the Garcia family." }],
-    stakeBusiness: false,
-    sacramentHymn: { number: 194, title: "There Is a Green Hill Far Away" },
-    speakers: [],
-    closingHymn: { number: 116, title: "Come, Follow Me" },
-    closingPrayer: "Brother Leo Garcia",
-  },
-  {
-    id: 6,
-    date: "2026-11-08",
-    meetingType: "regular",
-    presiding: "Bishop Daniel Santos",
-    conducting: "Brother Mark Reyes",
-    announcements: ["Youth service project on Saturday, November 14."],
-    openingHymn: { number: 30, title: "Come, Come, Ye Saints" },
-    openingPrayer: "Sister Grace Lim",
-    wardBusiness: [],
-    stakeBusiness: true,
-    sacramentHymn: { number: 172, title: "In Humility, Our Savior" },
-    speakers: [
-      { name: "Sister Mia Flores", topic: "Prayer", type: "speaker" },
-      { name: "Primary Children", topic: "I Am a Child of God", type: "musical-number" },
-      { name: "Brother Paul Tan", topic: "Service", type: "speaker" },
-    ],
-    closingHymn: { number: 98, title: "I Need Thee Every Hour" },
-    closingPrayer: "Brother Carlo Diaz",
-  },
-  {
-    id: 7,
-    date: "2026-11-15",
-    meetingType: "regular",
-    presiding: "Bishop Daniel Santos",
-    conducting: "Brother John Villanueva",
-    openingHymn: { number: 140, title: "Did You Think to Pray?" },
-    openingPrayer: "Brother Ben Torres",
-    wardBusiness: [],
-    stakeBusiness: false,
-    sacramentHymn: { number: 181, title: "Jesus of Nazareth, Savior and King" },
-    speakers: [
-      { name: "Brother Sam Uy", topic: "Repentance", type: "speaker" },
-      { name: "Sister Rose Aquino", topic: "The Atonement of Jesus Christ", type: "speaker" },
-    ],
-    closingHymn: { number: 166, title: "Abide with Me!" },
-    closingPrayer: "Sister Hope Reyes",
-  },
-];
+const ITEMS_PER_PAGE = 5;
 
-// Returns all meetings (newest first), or only meetings on a given date
-export function getMeetings(date?: string | null): SacramentMeeting[] {
-  const sorted = [...meetings].sort((a, b) => b.date.localeCompare(a.date));
-  if (date) {
-    return sorted.filter((meeting) => meeting.date === date);
+// Create the database client only when a query runs,
+// so the app can still build if DATABASE_URL is missing.
+function getSql() {
+  const url = process.env.DATABASE_URL;
+  if (!url) {
+    throw new Error("DATABASE_URL is not set. Run `vercel env pull .env.local`.");
   }
-  return sorted;
+  return neon(url);
 }
 
-// Returns one meeting by id, or undefined if not found
-export function getMeetingById(id: number): SacramentMeeting | undefined {
-  return meetings.find((meeting) => meeting.id === id);
+// Searches presiding, conducting, meeting type, and speaker names. Newest first, 5 per page.
+export async function getMeetings(
+  query: string = "",
+  currentPage: number = 1
+): Promise<SacramentMeeting[]> {
+  const sql = getSql();
+  const searchTerm = `%${query}%`;
+  const offset = (currentPage - 1) * ITEMS_PER_PAGE;
+
+  const rows = await sql`
+    SELECT
+      id,
+      to_char(date, 'YYYY-MM-DD') AS "date",
+      meeting_type   AS "meetingType",
+      presiding, conducting, announcements,
+      opening_hymn   AS "openingHymn",
+      opening_prayer AS "openingPrayer",
+      ward_business  AS "wardBusiness",
+      stake_business AS "stakeBusiness",
+      sacrament_hymn AS "sacramentHymn",
+      speakers,
+      closing_hymn   AS "closingHymn",
+      closing_prayer AS "closingPrayer"
+    FROM meetings
+    WHERE
+      presiding ILIKE ${searchTerm}
+      OR conducting ILIKE ${searchTerm}
+      OR meeting_type ILIKE ${searchTerm}
+      OR speakers::text ILIKE ${searchTerm}
+    ORDER BY date DESC
+    LIMIT ${ITEMS_PER_PAGE} OFFSET ${offset}
+  `;
+  return rows as unknown as SacramentMeeting[];
 }
 
-// Returns the meeting for a Sunday, or the closest earlier meeting
-export function getMeetingForSunday(sunday: string): SacramentMeeting | undefined {
-  return getMeetings().find((meeting) => meeting.date <= sunday);
+// How many pages of results a search has
+export async function getMeetingsTotalPages(query: string = ""): Promise<number> {
+  const sql = getSql();
+  const searchTerm = `%${query}%`;
+
+  const rows = await sql`
+    SELECT COUNT(*) AS count FROM meetings
+    WHERE
+      presiding ILIKE ${searchTerm}
+      OR conducting ILIKE ${searchTerm}
+      OR meeting_type ILIKE ${searchTerm}
+      OR speakers::text ILIKE ${searchTerm}
+  `;
+  return Math.ceil(Number(rows[0].count) / ITEMS_PER_PAGE);
+}
+
+// All meetings (used by GET /api/meetings), or only one date (?date=YYYY-MM-DD)
+export async function getAllMeetings(date?: string | null): Promise<SacramentMeeting[]> {
+  const sql = getSql();
+
+  const rows = await sql`
+    SELECT
+      id,
+      to_char(date, 'YYYY-MM-DD') AS "date",
+      meeting_type   AS "meetingType",
+      presiding, conducting, announcements,
+      opening_hymn   AS "openingHymn",
+      opening_prayer AS "openingPrayer",
+      ward_business  AS "wardBusiness",
+      stake_business AS "stakeBusiness",
+      sacrament_hymn AS "sacramentHymn",
+      speakers,
+      closing_hymn   AS "closingHymn",
+      closing_prayer AS "closingPrayer"
+    FROM meetings
+    WHERE ${date ?? null}::date IS NULL OR date = ${date ?? null}::date
+    ORDER BY date DESC
+  `;
+  return rows as unknown as SacramentMeeting[];
+}
+
+// One meeting by id, or null if it doesn't exist
+export async function getMeetingById(id: number): Promise<SacramentMeeting | null> {
+  const sql = getSql();
+
+  const rows = await sql`
+    SELECT
+      id,
+      to_char(date, 'YYYY-MM-DD') AS "date",
+      meeting_type   AS "meetingType",
+      presiding, conducting, announcements,
+      opening_hymn   AS "openingHymn",
+      opening_prayer AS "openingPrayer",
+      ward_business  AS "wardBusiness",
+      stake_business AS "stakeBusiness",
+      sacrament_hymn AS "sacramentHymn",
+      speakers,
+      closing_hymn   AS "closingHymn",
+      closing_prayer AS "closingPrayer"
+    FROM meetings
+    WHERE id = ${id}
+  `;
+  return (rows[0] as unknown as SacramentMeeting | undefined) ?? null;
+}
+
+// The id of the meeting on a Sunday, or the closest earlier meeting
+export async function getMeetingIdForSunday(sunday: string): Promise<number | null> {
+  const sql = getSql();
+
+  const rows = await sql`
+    SELECT id FROM meetings
+    WHERE date <= ${sunday}::date
+    ORDER BY date DESC
+    LIMIT 1
+  `;
+  return rows.length > 0 ? Number(rows[0].id) : null;
+}
+
+// Mutation stubs - these will be connected to the database in Week 04
+export async function addMeeting(data: Omit<SacramentMeeting, "id">): Promise<SacramentMeeting> {
+  throw new Error(`addMeeting for ${data.date}: database implementation coming in Week 04`);
+}
+
+export async function updateMeeting(
+  id: number,
+  updates: Partial<SacramentMeeting>
+): Promise<SacramentMeeting | null> {
+  throw new Error(
+    `updateMeeting ${id} (${Object.keys(updates).length} fields): coming in Week 04`
+  );
+}
+
+export async function deleteMeeting(id: number): Promise<boolean> {
+  throw new Error(`deleteMeeting ${id}: database implementation coming in Week 04`);
 }
