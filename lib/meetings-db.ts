@@ -126,20 +126,60 @@ export async function getMeetingIdForSunday(sunday: string): Promise<number | nu
   return rows.length > 0 ? Number(rows[0].id) : null;
 }
 
-// Mutation stubs - these will be connected to the database in Week 04
-export async function addMeeting(data: Omit<SacramentMeeting, "id">): Promise<SacramentMeeting> {
-  throw new Error(`addMeeting for ${data.date}: database implementation coming in Week 04`);
+// The data needed to create or update a meeting (everything except the id)
+export type MeetingInput = Omit<SacramentMeeting, "id">;
+
+// Creates a meeting and returns its new id
+export async function addMeeting(data: MeetingInput): Promise<number> {
+  const sql = getSql();
+
+  const rows = await sql`
+    INSERT INTO meetings (
+      date, meeting_type, presiding, conducting, announcements,
+      opening_hymn, opening_prayer, ward_business, stake_business,
+      sacrament_hymn, speakers, closing_hymn, closing_prayer
+    ) VALUES (
+      ${data.date}::date, ${data.meetingType}, ${data.presiding}, ${data.conducting},
+      ${data.announcements ?? []}::text[],
+      ${JSON.stringify(data.openingHymn)}::jsonb, ${data.openingPrayer},
+      ${JSON.stringify(data.wardBusiness)}::jsonb, ${data.stakeBusiness},
+      ${JSON.stringify(data.sacramentHymn)}::jsonb, ${JSON.stringify(data.speakers)}::jsonb,
+      ${JSON.stringify(data.closingHymn)}::jsonb, ${data.closingPrayer}
+    )
+    RETURNING id
+  `;
+  return Number(rows[0].id);
 }
 
-export async function updateMeeting(
-  id: number,
-  updates: Partial<SacramentMeeting>
-): Promise<SacramentMeeting | null> {
-  throw new Error(
-    `updateMeeting ${id} (${Object.keys(updates).length} fields): coming in Week 04`
-  );
+// Updates a meeting. Returns false if no meeting has that id.
+export async function updateMeeting(id: number, data: MeetingInput): Promise<boolean> {
+  const sql = getSql();
+
+  const rows = await sql`
+    UPDATE meetings SET
+      date = ${data.date}::date,
+      meeting_type = ${data.meetingType},
+      presiding = ${data.presiding},
+      conducting = ${data.conducting},
+      announcements = ${data.announcements ?? []}::text[],
+      opening_hymn = ${JSON.stringify(data.openingHymn)}::jsonb,
+      opening_prayer = ${data.openingPrayer},
+      ward_business = ${JSON.stringify(data.wardBusiness)}::jsonb,
+      stake_business = ${data.stakeBusiness},
+      sacrament_hymn = ${JSON.stringify(data.sacramentHymn)}::jsonb,
+      speakers = ${JSON.stringify(data.speakers)}::jsonb,
+      closing_hymn = ${JSON.stringify(data.closingHymn)}::jsonb,
+      closing_prayer = ${data.closingPrayer}
+    WHERE id = ${id}
+    RETURNING id
+  `;
+  return rows.length > 0;
 }
 
+// Deletes a meeting. Returns false if no meeting has that id.
 export async function deleteMeeting(id: number): Promise<boolean> {
-  throw new Error(`deleteMeeting ${id}: database implementation coming in Week 04`);
+  const sql = getSql();
+
+  const rows = await sql`DELETE FROM meetings WHERE id = ${id} RETURNING id`;
+  return rows.length > 0;
 }

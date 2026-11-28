@@ -13,6 +13,7 @@ export default function MeetingsLayout({
           links={[
             { href: "/meetings", label: "All Meetings", exact: true },
             { href: "/meetings/current", label: "This Sunday" },
+            { href: "/meetings/new", label: "New Meeting" },
           ]}
         />
       </div>
